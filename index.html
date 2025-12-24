@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Planner</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+        }
+        header {
+            background: #2563eb;
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+        main {
+            max-width: 500px;
+            margin: 20px auto;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 16px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        li {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        li.completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+        .time {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📝 Task Planner</h1>
+    <p>Tasks with date & time</p>
+</header>
+
+<main>
+    <input id="taskText" placeholder="Task name">
+    <input id="taskTime" type="datetime-local">
+    <button onclick="addTask()">Add Task</button>
+
+    <ul id="taskList"></ul>
+</main>
+
+<script>
+/* REGISTER SERVICE WORKER */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+
+/* REQUEST NOTIFICATION PERMISSION */
+if ('Notification' in window) {
+    Notification.requestPermission();
+}
+
+const taskList = document.getElementById("taskList");
+
+/* LOAD TASKS */
+function loadTasks() {
+    const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    tasks.forEach(createTask);
+}
+
+/* SAVE TASKS */
+function saveTasks() {
+    const tasks = [];
+    document.querySelectorAll("li").forEach(li => {
+        tasks.push({
+            text: li.dataset.text,
+            time: li.dataset.time,
+            completed: li.classList.contains("completed")
+        });
+    });
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+/* CREATE TASK */
+function createTask(task) {
+    const li = document.createElement("li");
+    li.dataset.text = task.text;
+    li.dataset.time = task.time;
+    if (task.completed) li.classList.add("completed");
+
+    const date = new Date(task.time);
+
+    li.innerHTML = `
+        <strong>${task.text}</strong>
+        <div class="time">🕒 ${date.toLocaleString()}</div>
+        <button onclick="toggleTask(this)">✔ Complete</button>
+        <button onclick="deleteTask(this)">❌ Delete</button>
+    `;
+
+    taskList.appendChild(li);
+    scheduleNotification(task.text, date);
+}
+
+/* ADD TASK */
+function addTask() {
+    const text = taskText.value.trim();
+    const time = taskTime.value;
+    if (!text || !time) return;
+
+    createTask({ text, time, completed: false });
+    saveTasks();
+
+    taskText.value = "";
+    taskTime.value = "";
+}
+
+/* TOGGLE */
+function toggleTask(btn) {
+    btn.parentElement.classList.toggle("completed");
+    saveTasks();
+}
+
+/* DELETE */
+function deleteTask(btn) {
+    btn.parentElement.remove();
+    saveTasks();
+}
+
+/* NOTIFICATION */
+function scheduleNotification(text, date) {
+    const delay = date - new Date();
+    if (delay > 0) {
+        setTimeout(() => {
+            new Notification("Task Reminder", {
+                body: text
+            });
+        }, delay);
+    }
+}
+
+loadTasks();
+</script>
+
+</body>
+</html>
