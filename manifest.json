@@ -1,15 +1,45 @@
 {
+  "id": "/task-app/",
   "name": "Task Planner",
   "short_name": "Tasks",
-  "start_url": "./index.html",
+  "description": "A simple task planner that lets users create tasks with exact date and time, works offline, and can be installed as an app.",
+  "start_url": "/task-app/index.html",
+  "scope": "/task-app/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#2563eb",
   "theme_color": "#2563eb",
+  "categories": ["productivity", "utilities"],
   "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1828/1828640.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/1828/1828640.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://dummyimage.com/540x720/2563eb/ffffff&text=Task+Planner",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "https://dummyimage.com/720x540/2563eb/ffffff&text=Task+Planner",
+      "sizes": "720x540",
+      "type": "image/png",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "scope_extensions": [
+    {
+      "origin": "https://YOUR_GITHUB_USERNAME.github.io"
     }
   ]
 }
